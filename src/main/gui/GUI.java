@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
 
 import main.controller.Controller;
 import main.exceptions.InvalidNameException;
@@ -28,10 +27,9 @@ public class GUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	protected Controller controller;
-	
-	protected JTextField textField;
-	protected JComboBox<String> comboBox;
+	protected JComboBox<String> loadComboBox;
 	protected JButton loadButton;
+	private JComboBox<String> saveComboBox;
 	
 	/**
 	 * Creates a new GUI
@@ -70,15 +68,6 @@ public class GUI extends JFrame {
 		gbc_saveButton.gridy = 0;
 		getContentPane().add(saveButton, gbc_saveButton);
 		
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(10, 10, 10, 10);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 0;
-		getContentPane().add(textField, gbc_textField);
-		textField.setColumns(10);
-		
 		loadButton = new JButton("Load");
 		loadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -92,13 +81,22 @@ public class GUI extends JFrame {
 		gbc_loadButton.gridy = 1;
 		getContentPane().add(loadButton, gbc_loadButton);
 		
-		comboBox = new JComboBox<>();
-		GridBagConstraints gbc_comboBox = new GridBagConstraints();
-		gbc_comboBox.insets = new Insets(0, 10, 10, 10);
-		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox.gridx = 1;
-		gbc_comboBox.gridy = 1;
-		getContentPane().add(comboBox, gbc_comboBox);
+		saveComboBox = new JComboBox<>();
+		saveComboBox.setEditable(true);
+		GridBagConstraints gbc_saveComboBox = new GridBagConstraints();
+		gbc_saveComboBox.insets = new Insets(10, 10, 10, 10);
+		gbc_saveComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_saveComboBox.gridx = 1;
+		gbc_saveComboBox.gridy = 0;
+		getContentPane().add(saveComboBox, gbc_saveComboBox);
+		
+		loadComboBox = new JComboBox<>();
+		GridBagConstraints gbc_loadComboBox = new GridBagConstraints();
+		gbc_loadComboBox.insets = new Insets(0, 10, 10, 10);
+		gbc_loadComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_loadComboBox.gridx = 1;
+		gbc_loadComboBox.gridy = 1;
+		getContentPane().add(loadComboBox, gbc_loadComboBox);
 		loadSaveNames();
 		
 		JButton backupButton = new JButton("Backup");
@@ -121,8 +119,7 @@ public class GUI extends JFrame {
 	 */
 	protected void save() {
 		try {
-			controller.save(textField.getText());
-			textField.setText("");
+			controller.save(saveComboBox.getSelectedItem().toString());
 			loadSaveNames();
 			JOptionPane.showMessageDialog(this, "Save completed", "Success", JOptionPane.PLAIN_MESSAGE);
 		} catch (IOException e) {
@@ -137,7 +134,7 @@ public class GUI extends JFrame {
 	 */
 	protected void load() {
 		try {
-			controller.load(String.valueOf(comboBox.getSelectedItem()));
+			controller.load(String.valueOf(loadComboBox.getSelectedItem()));
 			JOptionPane.showMessageDialog(this, "Load completed", "Success", JOptionPane.PLAIN_MESSAGE);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this, "Load error", "Error", JOptionPane.ERROR_MESSAGE);
@@ -162,13 +159,17 @@ public class GUI extends JFrame {
 	protected void loadSaveNames() {
 		List<String> saveNames = controller.getSaveNames();
 		if (saveNames.isEmpty()) {
-			comboBox.setEnabled(false);
+			loadComboBox.setEnabled(false);
 			loadButton.setEnabled(false);
+			saveComboBox.removeAllItems();
 		} else {
-			comboBox.setEnabled(true);
+			loadComboBox.setEnabled(true);
 			loadButton.setEnabled(true);
 			DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(saveNames.toArray(new String[0]));
-			comboBox.setModel(model);
+			loadComboBox.setModel(model);
+			model = new DefaultComboBoxModel<>(saveNames.toArray(new String[0]));
+			saveComboBox.setModel(model);
+			saveComboBox.setSelectedItem("");
 		}
 	}
 	
