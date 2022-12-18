@@ -26,14 +26,16 @@ public class SaveFileManager {
 		Files.createDirectories(Paths.get("backups/" + bkpName));
 		Files.copy(Paths.get(getSaveFilePath()), Paths.get("backups/" + bkpName + "/current"));
 
-		Files.walk(Paths.get("saves")).forEach(source -> {
-			Path destination = Paths.get("backups/" + bkpName + "/saves", source.toString().substring("saves".length()));
-			try {
-				Files.copy(source, destination);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
+		if (Files.exists(Paths.get("saves"))) {
+			Files.walk(Paths.get("saves")).forEach(source -> {
+				Path destination = Paths.get("backups/" + bkpName + "/saves", source.toString().substring("saves".length()));
+				try {
+					Files.copy(source, destination);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
 	}
 	
 	/**
